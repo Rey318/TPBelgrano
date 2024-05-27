@@ -15,7 +15,7 @@ public class Contactos {
     private String direccion;
     private String correo;
     private String localidad;
-
+   //Constructor personas
     public Contactos(int dni, String nombre, String apellido, String direccion, String correo, String localidad) {
         this.dni = dni;
         this.nombre = nombre;
@@ -24,7 +24,7 @@ public class Contactos {
         this.correo = correo;
         this.localidad = localidad;
     }
-
+   // Getters y Setters
     public int getDni() {
         return dni;
     }
