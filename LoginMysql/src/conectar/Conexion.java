@@ -1,10 +1,13 @@
 package conectar;
-
+import Persona.Contactos;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Conexion {
 
@@ -26,6 +29,37 @@ public class Conexion {
     // metodo de conexion
     public Connection getConexion() {
         return conect;
+    }
+    public List<Contactos> obtenerContactosBaseDatos() {
+        List<Contactos> contactos = new ArrayList<>();
+        Statement stmt = null;
+        ResultSet rsl = null;
+        try {
+            stmt = conect.createStatement();
+            rsl = stmt.executeQuery("SELECT dni, nombre, apellido, direccion, correo, localidad FROM contactos");
+            
+            while (rsl.next()) {
+                int dni = rsl.getInt("dni");
+                String nombre = rsl.getString("nombre");
+                String apellido = rsl.getString("apellido");
+                String direccion = rsl.getString("direccion");
+                String correo = rsl.getString("correo");
+                String localidad = rsl.getString("localidad");
+                
+                contactos.add(new Contactos(dni, nombre, apellido, direccion, correo, localidad));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (rsl != null) rsl.close();
+                if (stmt != null) stmt.close();
+                if (conect != null) conect.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return contactos;
     }
    //metodo de consulta
     public boolean conexion(String usuario, String contraseña) {
@@ -56,4 +90,5 @@ public class Conexion {
             System.out.println("Error al cerrar la conexion: " + ex.getMessage());
         }
     }
+    
 }

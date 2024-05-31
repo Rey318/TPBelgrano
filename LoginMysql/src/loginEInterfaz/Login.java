@@ -225,9 +225,9 @@ public class Login extends javax.swing.JFrame {
                         .addComponent(jLabel6)
                         .addGap(19, 19, 19))
                     .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGap(62, 62, 62)
+                        .addGap(52, 52, 52)
                         .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(48, 48, 48)
+                        .addGap(58, 58, 58)
                         .addComponent(jLabel5)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
@@ -253,10 +253,11 @@ public class Login extends javax.swing.JFrame {
     }//GEN-LAST:event_campoUsuarioActionPerformed
 
     private void btnRegActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRegActionPerformed
-       RegistroFrame registroFrame = new RegistroFrame();
+       RegistroUser registroFrame = new RegistroUser();
         registroFrame.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btnRegActionPerformed
+    // Metodo para limpiar campos 
     public void limpiarCampos() {
         campoUsuario.setText("");
         campoPass.setText("");

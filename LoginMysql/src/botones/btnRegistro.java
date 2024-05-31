@@ -11,7 +11,7 @@ import javax.swing.JOptionPane;
 import loginEInterfaz.HashPass;
 import loginEInterfaz.Login;
 import conectar.Conexion; 
-import loginEInterfaz.RegistroFrame;
+import loginEInterfaz.RegistroUser;
 
 
 public class btnRegistro {
@@ -21,7 +21,7 @@ public class btnRegistro {
     public btnRegistro() {
         conect = new Conexion();
     }
-    public void registrarUsuario(String usuario, String contraseña, RegistroFrame registroFrame) {
+    public void registrarUsuario(String usuario, String contraseña, RegistroUser registroFrame) {
         try {
             // Hashear la contraseña antes de almacenarla
             String contraseñaHasheada = HashPass.hashP(contraseña); //Hash tiene validaciones
