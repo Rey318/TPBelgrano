@@ -419,7 +419,7 @@ public class AgendaFrame extends javax.swing.JFrame {
         btnAgregar.actionPerformed(evt);
         JOptionPane.showMessageDialog(null, "Datos ingresados correctamente");
         // Cerrar la conexion
-        conect.close();
+       // conect.close();
         // Limpiar campos
         limpiarCampos();
 

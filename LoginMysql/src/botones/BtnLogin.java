@@ -52,10 +52,10 @@ public class BtnLogin {
             JOptionPane.showMessageDialog(null, "Los datos ingresados no son correctos");
             loginFrame.limpiarCampos();
         } finally {
-            conec.close();
+           // conec.close();
         }
     }
 
-    // Metodo para registarUsuario
+    
     
 }

@@ -21,17 +21,14 @@ public class HashPass {
            StringBuilder hexString = new StringBuilder();
            for (byte b: hash) {
                //convertir cada byte a HEXA
-               String hex = Integer.toString(0xff & b);
+               String hex = Integer.toHexString(0xff & b);
                if (hex.length() == 1) hexString.append('0') ;
-               hexString.append(hex);
-                   
-               
-          
+               hexString.append(hex);          
            }
              return hexString.toString();
         } catch (NoSuchAlgorithmException e) {
             
-            System.out.println("Error" );
+            System.out.println("Error" + e.getMessage() );
             return null;
         }
     }

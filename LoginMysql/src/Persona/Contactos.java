@@ -9,6 +9,7 @@ import java.sql.Connection;
 
 public class Contactos {
      // Variables
+    private int id;
     private int dni;
     private String nombre;
     private String apellido;
@@ -16,7 +17,8 @@ public class Contactos {
     private String correo;
     private String localidad;
    //Constructor personas
-    public Contactos(int dni, String nombre, String apellido, String direccion, String correo, String localidad) {
+    public Contactos(int id, int dni, String nombre, String apellido, String direccion, String correo, String localidad) {
+        this.id = id;
         this.dni = dni;
         this.nombre = nombre;
         this.apellido = apellido;
@@ -25,6 +27,13 @@ public class Contactos {
         this.localidad = localidad;
     }
    // Getters y Setters
+    
+    public int getId() {
+        return id;
+    }
+    public void setId(int id) {
+        this.id = id;
+    }
     public int getDni() {
         return dni;
     }

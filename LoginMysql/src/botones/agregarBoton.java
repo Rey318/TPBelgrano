@@ -37,6 +37,7 @@ public class agregarBoton implements ActionListener {
     public void actionPerformed(ActionEvent e) {
 
         try {
+             
             int dni = Integer.parseInt(dniField.getText());
             String nombre = nomField.getText();
             String apellido = apeField.getText();
@@ -44,7 +45,7 @@ public class agregarBoton implements ActionListener {
             String correo = correoField.getText();
             String localidad = localField.getText();
 
-            Contactos pers = new Contactos(dni, nombre, apellido, direccion, correo, localidad);
+            Contactos pers = new Contactos(8, dni, nombre, apellido, direccion, correo, localidad);
 
             guardarBaseDatos(pers);
             
@@ -58,10 +59,11 @@ public class agregarBoton implements ActionListener {
     private void guardarBaseDatos(Contactos pers) {
 
         // Consulta
-        String query = "INSERT INTO contactos (dni, nombre, apellido, direccion,correo, localidad) VALUES (?, ?, ?, ?, ?, ?)";
+        String query = "INSERT INTO contactos ( dni, nombre, apellido, direccion,correo, localidad) VALUES (?, ?, ?, ?, ?, ?)";
 
         // Preparar la consulta
         try (PreparedStatement stmt = conect.getConexion().prepareStatement(query)) {
+           
             stmt.setInt(1, pers.getDni());
             stmt.setString(2, pers.getNombre());
             stmt.setString(3, pers.getApellido());
@@ -73,7 +75,7 @@ public class agregarBoton implements ActionListener {
             System.out.println("Se cargo exitosamente los datos " + filasOcupada);
             stmt.close();
            
-
+            
         } catch (SQLException e) {
             e.printStackTrace();
             System.out.println("Error");

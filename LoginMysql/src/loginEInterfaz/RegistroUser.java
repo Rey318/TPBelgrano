@@ -4,19 +4,82 @@
  */
 package loginEInterfaz;
 
-/**
- *
- * @author Analia
- */
+import loginEInterfaz.HashPass;
+import conectar.Conexion;
+import javax.swing.JOptionPane;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+
 public class RegistroUser extends javax.swing.JFrame {
 
-    /**
-     * Creates new form RegistroUser
-     */
-    public RegistroUser() {
+    RegistroUser() {
         initComponents();
         setLocationRelativeTo(null);
     }
+    private void registrarUser() {
+        String usuario = fieldNewUser.getText();
+        String contraseña = new String(fieldPass1.getPassword());
+        String confirmarContraseña = new String(fieldPass2.getPassword());
+
+        if (usuario.isEmpty() || contraseña.isEmpty() || confirmarContraseña.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Todos los campos son obligatorios");
+            return;
+        }
+
+        if (!contraseña.equals(confirmarContraseña)) {
+            JOptionPane.showMessageDialog(null, "Las contraseñas no coinciden");
+            return; // Salir del método si las contraseñas no coinciden
+        }
+        
+        if (!PasswordValidator.validar(contraseña)) {
+            JOptionPane.showMessageDialog(this, "La contraseña no cumple con los datos requeridos");
+            return;
+        }
+
+        String hashedPassword = HashPass.hashP(contraseña);
+        
+        if (hashedPassword != null) {
+            System.out.println("Password hasheado:" + hashedPassword);
+            Connection con = Conexion.getConexion();
+            if (con != null) {
+                
+                try {
+                    String sql = "INSERT INTO usuarios (user, pass) VALUES (?, ?)";
+                   PreparedStatement  stmt = con.prepareStatement(sql);
+                    stmt.setString(1, usuario);
+                    stmt.setString(2, hashedPassword);
+                    System.out.println("Ejecutando inserción....");
+                    stmt.executeUpdate();
+                    JOptionPane.showMessageDialog(null, "Usuario registrado exitosamente");
+                   
+                    limpiarCampos();
+                } catch (SQLException e) {
+                    JOptionPane.showMessageDialog(null, "Error al registrar el Usuario " + e.getMessage());
+                    e.printStackTrace();
+                } finally {
+                    try {                        
+                        con.close();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                     
+                }
+            } else {
+                JOptionPane.showMessageDialog(this, "Error en la conexión a la base de datos" );
+                             
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Error al hashear la contraseña");
+        }
+    }
+
+    private void limpiarCampos() {
+        fieldNewUser.setText("");
+        fieldPass1.setText("");
+        fieldPass2.setText("");
+    }
+  
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -37,9 +100,9 @@ public class RegistroUser extends javax.swing.JFrame {
         jSeparator1 = new javax.swing.JSeparator();
         jSeparator2 = new javax.swing.JSeparator();
         jSeparator3 = new javax.swing.JSeparator();
-        jTextField1 = new javax.swing.JTextField();
-        jPasswordField1 = new javax.swing.JPasswordField();
-        jPasswordField3 = new javax.swing.JPasswordField();
+        fieldNewUser = new javax.swing.JTextField();
+        fieldPass1 = new javax.swing.JPasswordField();
+        fieldPass2 = new javax.swing.JPasswordField();
         jPanel4 = new javax.swing.JPanel();
         jButton2 = new javax.swing.JButton();
         jButton1 = new javax.swing.JButton();
@@ -88,20 +151,20 @@ public class RegistroUser extends javax.swing.JFrame {
         jLabel4.setForeground(new java.awt.Color(0, 0, 0));
         jLabel4.setText("Confirmar Contraseña:");
 
-        jTextField1.setBackground(new java.awt.Color(255, 255, 255));
-        jTextField1.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
-        jTextField1.setForeground(new java.awt.Color(0, 51, 204));
-        jTextField1.setBorder(null);
+        fieldNewUser.setBackground(new java.awt.Color(255, 255, 255));
+        fieldNewUser.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
+        fieldNewUser.setForeground(new java.awt.Color(0, 51, 204));
+        fieldNewUser.setBorder(null);
 
-        jPasswordField1.setBackground(new java.awt.Color(255, 255, 255));
-        jPasswordField1.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
-        jPasswordField1.setForeground(new java.awt.Color(0, 51, 204));
-        jPasswordField1.setBorder(null);
+        fieldPass1.setBackground(new java.awt.Color(255, 255, 255));
+        fieldPass1.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
+        fieldPass1.setForeground(new java.awt.Color(0, 51, 204));
+        fieldPass1.setBorder(null);
 
-        jPasswordField3.setBackground(new java.awt.Color(255, 255, 255));
-        jPasswordField3.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
-        jPasswordField3.setForeground(new java.awt.Color(0, 51, 204));
-        jPasswordField3.setBorder(null);
+        fieldPass2.setBackground(new java.awt.Color(255, 255, 255));
+        fieldPass2.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
+        fieldPass2.setForeground(new java.awt.Color(0, 51, 204));
+        fieldPass2.setBorder(null);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -118,9 +181,9 @@ public class RegistroUser extends javax.swing.JFrame {
                     .addComponent(jSeparator2, javax.swing.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE)
                     .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 219, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jSeparator3)
-                    .addComponent(jTextField1)
-                    .addComponent(jPasswordField1)
-                    .addComponent(jPasswordField3))
+                    .addComponent(fieldNewUser)
+                    .addComponent(fieldPass1)
+                    .addComponent(fieldPass2))
                 .addGap(35, 35, 35))
         );
         jPanel3Layout.setVerticalGroup(
@@ -129,19 +192,19 @@ public class RegistroUser extends javax.swing.JFrame {
                 .addGap(36, 36, 36)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(fieldNewUser, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(32, 32, 32)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPasswordField1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(fieldPass1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(32, 32, 32)
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jPasswordField3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(fieldPass2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jSeparator3, javax.swing.GroupLayout.PREFERRED_SIZE, 11, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(10, 10, 10))
@@ -245,15 +308,17 @@ public class RegistroUser extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
+        registrarUser();
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
+        Login lg = new Login();
+        lg.setVisible(true);
+        this.dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
+        System.exit(0);
     }//GEN-LAST:event_jButton3ActionPerformed
 
     /**
@@ -292,6 +357,9 @@ public class RegistroUser extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField fieldNewUser;
+    private javax.swing.JPasswordField fieldPass1;
+    private javax.swing.JPasswordField fieldPass2;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
@@ -304,11 +372,8 @@ public class RegistroUser extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JPasswordField jPasswordField1;
-    private javax.swing.JPasswordField jPasswordField3;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JSeparator jSeparator2;
     private javax.swing.JSeparator jSeparator3;
-    private javax.swing.JTextField jTextField1;
     // End of variables declaration//GEN-END:variables
 }
