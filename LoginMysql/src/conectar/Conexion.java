@@ -8,8 +8,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-
 import loginEInterfaz.HashPass;
+import javax.swing.JOptionPane;
 
 public class Conexion {
 
@@ -30,6 +30,9 @@ public class Conexion {
     
     // metodo de conexion
     public static Connection getConexion() {
+        if (conect == null) {
+            new Conexion();
+        }
         return conect;
     }
     // Metodo para obtener los contactos de la base de datos
@@ -66,31 +69,40 @@ public class Conexion {
         }
         return contactos;
     }
-   //metodo de consulta
+   //metodo de consulta de los usuarios
     public boolean conexion(String user, String pass) {
-        try {
-            String hashedPassword = HashPass.hashP(pass);
-            //consulta
-            String query = "SELECT * FROM usuarios WHERE user = ? AND pass = ? ";
-            
-            try (PreparedStatement preparedStatement = conect.prepareStatement(query)) {
-                preparedStatement.setString(1, user);
-                preparedStatement.setString(2, hashedPassword);
-                System.out.println("Ejecutando consulta....");
-                try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                    boolean resultado = resultSet.next();
-                    
-                    System.out.println("Resultado de la consulta: " + resultado);
-                    return resultado;
-                }
+    Connection conexion = null;
+    try {
+        conexion = Conexion.getConexion();
+        String hashedPassword = HashPass.hashP(pass);
+        String query = "SELECT * FROM usuarios WHERE user = ? AND pass = ?";
+        try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
+            preparedStatement.setString(1, user);
+            preparedStatement.setString(2, hashedPassword);
+            System.out.println("Ejecutando consulta....");
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                boolean resultado = resultSet.next();
+                System.out.println("Resultado de la consulta: " + resultado);
+                return resultado;
             }
-        } catch (SQLException ex) {
-            System.out.println("Error: " + ex.getMessage());
-            return false;
+        }
+    } catch (SQLException ex) {
+        ex.printStackTrace();
+        return false;
+    } finally {
+        // Cerrar la conexión al finalizar todas las operaciones
+        if (conexion != null) {
+            try {
+                conexion.close();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
         }
     }
+}
+
     //metodo cerrar la conexion
-    public void close() {
+    public static void close() {
         try {
             if (conect != null) {
                 conect.close();

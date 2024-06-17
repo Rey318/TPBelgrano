@@ -10,13 +10,16 @@ import javax.swing.JOptionPane;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.sql.ResultSet;
 
 public class RegistroUser extends javax.swing.JFrame {
 
     RegistroUser() {
         initComponents();
         setLocationRelativeTo(null);
+        Connection con = null;
     }
+
     private void registrarUser() {
         String usuario = fieldNewUser.getText();
         String contraseña = new String(fieldPass1.getPassword());
@@ -29,48 +32,65 @@ public class RegistroUser extends javax.swing.JFrame {
 
         if (!contraseña.equals(confirmarContraseña)) {
             JOptionPane.showMessageDialog(null, "Las contraseñas no coinciden");
-            return; // Salir del método si las contraseñas no coinciden
+            return;
         }
-        
+
         if (!PasswordValidator.validar(contraseña)) {
             JOptionPane.showMessageDialog(this, "La contraseña no cumple con los datos requeridos");
             return;
         }
 
         String hashedPassword = HashPass.hashP(contraseña);
-        
+
         if (hashedPassword != null) {
-            System.out.println("Password hasheado:" + hashedPassword);
             Connection con = Conexion.getConexion();
             if (con != null) {
-                
                 try {
+                    // Verificar si el usuario ya existe
+                    if (usuarioExiste(usuario, con)) {
+                        JOptionPane.showMessageDialog(null, "El usuario ya existe");
+                        return;
+                    }
+
+                    // Insertar el nuevo usuario
                     String sql = "INSERT INTO usuarios (user, pass) VALUES (?, ?)";
-                   PreparedStatement  stmt = con.prepareStatement(sql);
+                    PreparedStatement stmt = con.prepareStatement(sql);
                     stmt.setString(1, usuario);
                     stmt.setString(2, hashedPassword);
-                    System.out.println("Ejecutando inserción....");
                     stmt.executeUpdate();
+
                     JOptionPane.showMessageDialog(null, "Usuario registrado exitosamente");
-                   
                     limpiarCampos();
+
                 } catch (SQLException e) {
-                    JOptionPane.showMessageDialog(null, "Error al registrar el Usuario " + e.getMessage());
+                    JOptionPane.showMessageDialog(null, "Error al registrar el Usuario: " + e.getMessage());
                     e.printStackTrace();
                 } finally {
-                    try {                        
+                    try {
                         con.close();
                     } catch (SQLException e) {
                         e.printStackTrace();
                     }
-                     
                 }
             } else {
-                JOptionPane.showMessageDialog(this, "Error en la conexión a la base de datos" );
-                             
+                JOptionPane.showMessageDialog(this, "Error en la conexión a la base de datos");
             }
         } else {
             JOptionPane.showMessageDialog(this, "Error al hashear la contraseña");
+        }
+    }
+
+    private boolean usuarioExiste(String usuario, Connection con) {
+        String consulta = "SELECT * FROM usuarios WHERE user = ?";
+        try {
+            PreparedStatement stmt = con.prepareStatement(consulta);
+            stmt.setString(1, usuario);
+            ResultSet rsl = stmt.executeQuery();
+            return rsl.next();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Error al verificar la existencia del usuario");
+            e.printStackTrace();
+            return false;
         }
     }
 
@@ -79,7 +99,6 @@ public class RegistroUser extends javax.swing.JFrame {
         fieldPass1.setText("");
         fieldPass2.setText("");
     }
-  
 
     /**
      * This method is called from within the constructor to initialize the form.

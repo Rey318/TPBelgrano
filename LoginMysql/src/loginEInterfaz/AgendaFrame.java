@@ -10,6 +10,7 @@ import java.sql.Connection;
 import javax.swing.DefaultListModel;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
+import loginEInterfaz.ValidadorCorreo;
 
 public class AgendaFrame extends javax.swing.JFrame {
 
@@ -43,8 +44,14 @@ public class AgendaFrame extends javax.swing.JFrame {
            JOptionPane.showMessageDialog(null, "Todos los campos son obligatorios");
            return false;
         }
-        return true;
-    }
+     
+    String email = correoField.getText();
+     if (!ValidadorCorreo.isValidEmail(email)) {
+            JOptionPane.showMessageDialog(null, "Correo electrónico no válido o caracteres erroneos");
+            return false;
+        }
+     return true;
+}
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -208,6 +215,11 @@ public class AgendaFrame extends javax.swing.JFrame {
         jButton5.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
         jButton5.setForeground(new java.awt.Color(0, 0, 0));
         jButton5.setText("Limpiar");
+        jButton5.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton5ActionPerformed(evt);
+            }
+        });
 
         jLabel8.setFont(new java.awt.Font("Serif", 1, 14)); // NOI18N
         jLabel8.setForeground(new java.awt.Color(255, 255, 255));
@@ -293,7 +305,7 @@ public class AgendaFrame extends javax.swing.JFrame {
                             .addComponent(jSeparator4, javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(correoField, javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(localField, javax.swing.GroupLayout.Alignment.LEADING))
-                        .addContainerGap(180, Short.MAX_VALUE))
+                        .addContainerGap(230, Short.MAX_VALUE))
                     .addGroup(jPanel4Layout.createSequentialGroup()
                         .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 83, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -359,7 +371,7 @@ public class AgendaFrame extends javax.swing.JFrame {
 
         jPanel4Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jLabel3, jLabel4, jLabel5, jLabel6, jLabel7, jLabel9});
 
-        jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 80, 570, 370));
+        jPanel1.add(jPanel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 80, 620, 370));
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -392,7 +404,7 @@ public class AgendaFrame extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 1176, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -435,6 +447,10 @@ public class AgendaFrame extends javax.swing.JFrame {
         dsp.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton5ActionPerformed
+        limpiarCampos();
+    }//GEN-LAST:event_jButton5ActionPerformed
 
     /**
      * @param args the command line arguments
