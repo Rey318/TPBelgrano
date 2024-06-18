@@ -76,10 +76,13 @@ public class Conexion {
         conexion = Conexion.getConexion();
         String hashedPassword = HashPass.hashP(pass);
         String query = "SELECT * FROM usuarios WHERE user = ? AND pass = ?";
+       
         try (PreparedStatement preparedStatement = conexion.prepareStatement(query)) {
+           
             preparedStatement.setString(1, user);
             preparedStatement.setString(2, hashedPassword);
             System.out.println("Ejecutando consulta....");
+            
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 boolean resultado = resultSet.next();
                 System.out.println("Resultado de la consulta: " + resultado);

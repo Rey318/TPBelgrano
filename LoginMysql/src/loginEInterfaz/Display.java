@@ -15,27 +15,25 @@ import java.util.List;
 import javax.swing.table.DefaultTableModel;
 import Persona.Contactos;
 import java.awt.Image;
+import java.sql.PreparedStatement;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 
-
 public class Display extends javax.swing.JFrame {
 
-   private Conexion conexion;
+    private Conexion conexion;
+
     public Display() {
-       
+
         initComponents();
         setLocationRelativeTo(null);
-        setSize(1200,500);
+        setSize(1200, 500);
         conexion = new Conexion();
         cargarContactos();
-       agregarImagenEscaladaAlBoton(jButton1, "/imagenes/—Pngtree—vector left arrow icon_4231912.png", 20, 20);
+        agregarImagenEscaladaAlBoton(jButton1, "/imagenes/—Pngtree—vector left arrow icon_4231912.png", 20, 20);
     }
-    
-    
 
-    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -95,7 +93,7 @@ public class Display extends javax.swing.JFrame {
         jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/imagenes/logo.jpg.png"))); // NOI18N
 
-        jButton2.setBackground(new java.awt.Color(102, 102, 102));
+        jButton2.setBackground(new java.awt.Color(0, 0, 255));
         jButton2.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
         jButton2.setText("Salir");
         jButton2.setMaximumSize(new java.awt.Dimension(15, 30));
@@ -107,6 +105,7 @@ public class Display extends javax.swing.JFrame {
             }
         });
 
+        jButton3.setBackground(new java.awt.Color(255, 0, 0));
         jButton3.setFont(new java.awt.Font("Times New Roman", 1, 12)); // NOI18N
         jButton3.setText("Borrar");
         jButton3.setMaximumSize(new java.awt.Dimension(15, 30));
@@ -189,20 +188,39 @@ public class Display extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         AgendaFrame af = new AgendaFrame();
-        af.setVisible(true);        
+        af.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-       System.exit(0);
+        System.exit(0);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
-        // TODO add your handling code here:
+       int filaSelecc = jTable1.getSelectedRow();
+    
+    if(filaSelecc >= 0) {
+        String contactIdString = jTable1.getValueAt(filaSelecc, 0).toString();
+        try {
+            int contactId = Integer.parseInt(contactIdString);
+            int confirmar = JOptionPane.showConfirmDialog(this, "¿Estás seguro de eliminar este contacto?");
+            if (confirmar == JOptionPane.YES_OPTION) {
+                EliminarContacto(contactId);
+                cargarContactos();
+            }
+        } catch (NumberFormatException e) {
+            JOptionPane.showMessageDialog(this, "El ID del contacto no es válido.");
+        }
+    } else {
+        JOptionPane.showMessageDialog(this, "Por favor, selecciona un contacto para borrar.");
+    }
+    
+
+
     }//GEN-LAST:event_jButton3ActionPerformed
-  
+
 // Metodo cargar contactos
-    public void cargarContactos() {
+public void cargarContactos() {
         Conexion conect = new Conexion();
         
         List<Contactos> contactos = conect.obtenerContactosBaseDatos();
@@ -216,7 +234,7 @@ public class Display extends javax.swing.JFrame {
                // Agregar una nueva fila en la tabla
                
                model.addRow(new Object[] {
-                   contacto.getId(),contacto.getDni(), contacto.getNombre(), contacto.getApellido(),
+                   String.valueOf(contacto.getId()),contacto.getDni(), contacto.getNombre(), contacto.getApellido(),
                    contacto.getDireccion(), contacto.getCorreo(), contacto.getLocalidad()
                    
                });
@@ -226,10 +244,12 @@ public class Display extends javax.swing.JFrame {
     }
     
            @Override
-           public void dispose() {
+public void dispose() {
         super.dispose();
         conexion.close();
     }
+  
+
            
           private void agregarImagenEscaladaAlBoton(JButton boton, String rutaImagen, int ancho, int alto) {
         ImageIcon iconoOriginal = new ImageIcon(getClass().getResource(rutaImagen));
@@ -239,7 +259,30 @@ public class Display extends javax.swing.JFrame {
         boton.setIcon(iconoEscalado);
     }
 
-   
+             public void EliminarContacto(int id_contac) {
+       String url = "jdbc:mysql://localhost:3306/usuario";
+        String user = "root";
+        String pass = "Rooot";
+        
+        String consulta = "DELETE FROM contactos WHERE id_contac = ?";
+        
+        try (Connection con = DriverManager.getConnection(url, user, pass);
+            PreparedStatement stmt = con.prepareStatement(consulta)) {
+            stmt.setInt(1, id_contac);
+            int filaAfectada = stmt.executeUpdate();
+            
+            if (filaAfectada > 0) {
+                JOptionPane.showMessageDialog(null, "El contacto ha sido eliminado exitosamente");
+            } else {
+                 JOptionPane.showMessageDialog(null, "No se encontro el contacto id");
+            }
+        } catch (SQLException ex) {
+             JOptionPane.showMessageDialog(null, "No se puede eliminar el contacto");
+              ex.printStackTrace();
+        }
+    }
+
+
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -251,16 +294,28 @@ public class Display extends javax.swing.JFrame {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
-                }
+
+}
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Display.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Display.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Display.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Display.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Display.class  
+
+.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
+} catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(Display.class  
+
+.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
+} catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(Display.class  
+
+.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
+} catch (javax.swing.UnsupportedLookAndFeelException ex) {
+            java.util.logging.Logger.getLogger(Display.class  
+
+.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
