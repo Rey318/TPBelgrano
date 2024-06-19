@@ -14,10 +14,12 @@ import java.sql.ResultSet;
 
 public class RegistroUser extends javax.swing.JFrame {
 
+    private Connection con; // Declarar la conexión como atributo de la clase
+
     RegistroUser() {
         initComponents();
         setLocationRelativeTo(null);
-        Connection con = null;
+        con = Conexion.getConexion(); // Obtener la conexión al inicializar la ventana
     }
 
     private void registrarUser() {
@@ -36,57 +38,47 @@ public class RegistroUser extends javax.swing.JFrame {
         }
 
         if (!PasswordValidator.validar(contraseña)) {
-            JOptionPane.showMessageDialog(this, "La contraseña no cumple con los datos requeridos");
+            JOptionPane.showMessageDialog(this, "La contraseña no cumple con los requisitos");
             return;
         }
 
         String hashedPassword = HashPass.hashP(contraseña);
 
         if (hashedPassword != null) {
-            Connection con = Conexion.getConexion();
-            if (con != null) {
-                try {
-                    // Verificar si el usuario ya existe
-                    if (usuarioExiste(usuario, con)) {
-                        JOptionPane.showMessageDialog(null, "El usuario ya existe");
-                        return;
-                    }
+            try {
+                // Verificar si el usuario ya existe
+                if (usuarioExiste(usuario)) {
+                    JOptionPane.showMessageDialog(null, "El usuario ya existe");
+                    limpiarCampos();
+                    return;
+                }
 
-                    // Insertar el nuevo usuario
-                    String sql = "INSERT INTO usuarios (user, pass) VALUES (?, ?)";
-                    PreparedStatement stmt = con.prepareStatement(sql);
+                // Insertar el nuevo usuario
+                String sql = "INSERT INTO usuarios (user, pass) VALUES (?, ?)";
+                try (PreparedStatement stmt = con.prepareStatement(sql)) {
                     stmt.setString(1, usuario);
                     stmt.setString(2, hashedPassword);
                     stmt.executeUpdate();
-
-                    JOptionPane.showMessageDialog(null, "Usuario registrado exitosamente");
-                    limpiarCampos();
-
-                } catch (SQLException e) {
-                    JOptionPane.showMessageDialog(null, "Error al registrar el Usuario: " + e.getMessage());
-                    e.printStackTrace();
-                } finally {
-                    try {
-                        con.close();
-                    } catch (SQLException e) {
-                        e.printStackTrace();
-                    }
                 }
-            } else {
-                JOptionPane.showMessageDialog(this, "Error en la conexión a la base de datos");
+
+                JOptionPane.showMessageDialog(null, "Usuario registrado exitosamente");
+                limpiarCampos();
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, "Error al registrar el Usuario: " + e.getMessage());
+                e.printStackTrace();
             }
         } else {
             JOptionPane.showMessageDialog(this, "Error al hashear la contraseña");
         }
     }
 
-    private boolean usuarioExiste(String usuario, Connection con) {
+    private boolean usuarioExiste(String usuario) {
         String consulta = "SELECT * FROM usuarios WHERE user = ?";
-        try {
-            PreparedStatement stmt = con.prepareStatement(consulta);
+        try (PreparedStatement stmt = con.prepareStatement(consulta)) {
             stmt.setString(1, usuario);
-            ResultSet rsl = stmt.executeQuery();
-            return rsl.next();
+            try (ResultSet rsl = stmt.executeQuery()) {
+                return rsl.next();
+            }
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, "Error al verificar la existencia del usuario");
             e.printStackTrace();
@@ -100,6 +92,10 @@ public class RegistroUser extends javax.swing.JFrame {
         fieldPass2.setText("");
     }
 
+
+
+
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always

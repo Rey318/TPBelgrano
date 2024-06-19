@@ -57,7 +57,9 @@ public class Conexion {
                 contactos.add(new Contactos(id_contac, dni, nombre, apellido, direccion, correo, localidad));
             }
         } catch (SQLException e) {
+            
             e.printStackTrace();
+       
         } finally {
             try {
                 if (rsl != null) rsl.close();
